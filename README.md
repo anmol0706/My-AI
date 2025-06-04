@@ -213,5 +213,28 @@ DEBUG=True
 ## License
 This project is provided as-is for educational and demonstration purposes.
 
+## Deployment
+
+### Deploy on Render (Recommended)
+This application is ready for deployment on Render platform:
+
+1. **Fork this repository** to your GitHub account
+2. **Sign up** at [render.com](https://render.com)
+3. **Create a new Web Service** and connect your GitHub repository
+4. **Set environment variables**:
+   - `GEMINI_API_KEY`: Your Google Gemini API key
+   - `HUGGINGFACE_API_KEY`: Your Hugging Face API key
+   - `DEBUG`: Set to `false` for production
+5. **Deploy** - Render will automatically build and deploy your app
+
+📖 **Detailed deployment guide**: See [DEPLOYMENT.md](DEPLOYMENT.md)
+
+### Other Platforms
+The application can also be deployed on:
+- **Heroku**: Use the same configuration with a Procfile
+- **Railway**: Direct GitHub integration
+- **DigitalOcean App Platform**: Container-based deployment
+- **AWS/GCP/Azure**: Using container services
+
 ## Support
 For issues or questions, please check the troubleshooting section or review the code documentation.
