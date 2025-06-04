@@ -19,7 +19,13 @@
                     <i class="fas fa-robot"></i>
                     AI Web Application
                 </h1>
-                <nav class="nav-tabs">
+
+                <!-- Mobile Navigation Toggle -->
+                <button class="mobile-nav-toggle" id="mobile-nav-toggle" aria-label="Toggle navigation">
+                    <i class="fas fa-bars"></i>
+                </button>
+
+                <nav class="nav-tabs" id="nav-tabs">
                     <button class="nav-tab active" data-tab="chat">
                         <i class="fas fa-comments"></i>
                         Chat
@@ -36,6 +42,14 @@
         <main class="main-content">
             <!-- Chat Tab -->
             <div class="tab-content active" id="chat-tab">
+                <!-- Mobile Sidebar Toggle Button -->
+                <button class="mobile-sidebar-toggle" id="mobile-sidebar-toggle" aria-label="Toggle chat history">
+                    <i class="fas fa-history"></i>
+                </button>
+
+                <!-- Mobile Sidebar Backdrop -->
+                <div class="mobile-sidebar-backdrop" id="mobile-sidebar-backdrop"></div>
+
                 <div class="chat-layout">
                     <!-- Chat Sidebar -->
                     <div class="chat-sidebar" id="chat-sidebar">

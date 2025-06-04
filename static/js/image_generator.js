@@ -1,6 +1,8 @@
 class ImageGenerator {
     constructor() {
         this.isLoading = false;
+        this.mobileNavOpen = false;
+        this.isMobile = window.innerWidth <= 768;
         this.init();
     }
 
@@ -40,6 +42,22 @@ class ImageGenerator {
         promptInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter' && e.ctrlKey) {
                 this.generateImage();
+            }
+        });
+
+        // Mobile navigation functionality
+        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+        if (mobileNavToggle) {
+            mobileNavToggle.addEventListener('click', () => this.toggleMobileNav());
+        }
+
+        // Window resize handler for responsive behavior
+        window.addEventListener('resize', () => this.handleResize());
+
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.mobileNavOpen && !e.target.closest('.nav-tabs') && !e.target.closest('.mobile-nav-toggle')) {
+                this.closeMobileNav();
             }
         });
     }
@@ -349,14 +367,54 @@ class ImageGenerator {
     showToast(message, type = 'success') {
         const toast = document.getElementById('toast');
         const toastMessage = document.getElementById('toast-message');
-        
+
         toastMessage.textContent = message;
         toast.className = `toast ${type}`;
         toast.style.display = 'block';
-        
+
         setTimeout(() => {
             toast.style.display = 'none';
         }, 3000);
+    }
+
+    // Mobile Navigation Methods
+    toggleMobileNav() {
+        this.mobileNavOpen = !this.mobileNavOpen;
+        const navTabs = document.getElementById('nav-tabs');
+        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+
+        if (this.mobileNavOpen) {
+            navTabs.classList.add('mobile-open');
+            mobileNavToggle.innerHTML = '<i class="fas fa-times"></i>';
+        } else {
+            navTabs.classList.remove('mobile-open');
+            mobileNavToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    }
+
+    closeMobileNav() {
+        if (this.mobileNavOpen) {
+            this.mobileNavOpen = false;
+            const navTabs = document.getElementById('nav-tabs');
+            const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+
+            navTabs.classList.remove('mobile-open');
+            mobileNavToggle.innerHTML = '<i class="fas fa-bars"></i>';
+        }
+    }
+
+    // Handle window resize for responsive behavior
+    handleResize() {
+        const newIsMobile = window.innerWidth <= 768;
+
+        if (newIsMobile !== this.isMobile) {
+            this.isMobile = newIsMobile;
+
+            // Close mobile nav when switching to desktop
+            if (!this.isMobile) {
+                this.closeMobileNav();
+            }
+        }
     }
 }
 

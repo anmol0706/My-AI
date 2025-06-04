@@ -9,6 +9,9 @@ class AIWebApp {
         this.chatSessions = [];
         this.currentSessionId = null;
         this.sidebarCollapsed = false;
+        this.mobileNavOpen = false;
+        this.mobileSidebarOpen = false;
+        this.isMobile = window.innerWidth <= 768;
 
         // API endpoints
         this.API_BASE = '/api';
@@ -23,7 +26,7 @@ class AIWebApp {
         this.setupEventListeners();
         this.loadStoredData();
         this.updateUI();
-        
+
         console.log('AI Web Application initialized');
     }
     
@@ -39,17 +42,24 @@ class AIWebApp {
         const chatInput = document.getElementById('chat-input');
         const sendButton = document.getElementById('send-button');
         const clearChatButton = document.getElementById('clear-chat');
-        
-        chatInput.addEventListener('input', () => this.handleChatInput());
-        chatInput.addEventListener('keydown', (e) => {
-            if (e.key === 'Enter' && !e.shiftKey) {
-                e.preventDefault();
-                this.sendMessage();
-            }
-        });
-        
-        sendButton.addEventListener('click', () => this.sendMessage());
-        clearChatButton.addEventListener('click', () => this.clearChat());
+
+        if (chatInput) {
+            chatInput.addEventListener('input', () => this.handleChatInput());
+            chatInput.addEventListener('keydown', (e) => {
+                if (e.key === 'Enter' && !e.shiftKey) {
+                    e.preventDefault();
+                    this.sendMessage();
+                }
+            });
+        }
+
+        if (sendButton) {
+            sendButton.addEventListener('click', () => this.sendMessage());
+        }
+
+        if (clearChatButton) {
+            clearChatButton.addEventListener('click', () => this.clearChat());
+        }
         
         // Image generation functionality
         const imagePrompt = document.getElementById('image-prompt');
@@ -95,18 +105,95 @@ class AIWebApp {
         const importButton = document.getElementById('import-data');
         const clearAllButton = document.getElementById('clear-all-data');
         const fileInput = document.getElementById('file-input');
-        
-        exportButton.addEventListener('click', () => this.exportData());
-        importButton.addEventListener('click', () => fileInput.click());
-        clearAllButton.addEventListener('click', () => this.clearAllData());
-        fileInput.addEventListener('change', (e) => this.importData(e));
+
+        if (exportButton) {
+            exportButton.addEventListener('click', () => this.exportData());
+        }
+        if (importButton) {
+            importButton.addEventListener('click', () => fileInput && fileInput.click());
+        }
+        if (clearAllButton) {
+            clearAllButton.addEventListener('click', () => this.clearAllData());
+        }
+        if (fileInput) {
+            fileInput.addEventListener('change', (e) => this.importData(e));
+        }
 
         // Chat sidebar functionality
         const newChatButton = document.getElementById('new-chat-btn');
-        const sidebarToggle = document.getElementById('sidebar-toggle');
 
-        newChatButton.addEventListener('click', () => this.startNewChat());
-        sidebarToggle.addEventListener('click', () => this.toggleSidebar());
+        if (newChatButton) {
+            newChatButton.addEventListener('click', () => this.startNewChat());
+        }
+
+        // Mobile navigation functionality
+        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+
+        if (mobileNavToggle) {
+            // Add both click and touch events for better mobile support
+            mobileNavToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleMobileNav();
+            });
+
+            mobileNavToggle.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleMobileNav();
+            });
+        }
+
+        // Mobile sidebar functionality
+        const mobileSidebarToggle = document.getElementById('mobile-sidebar-toggle');
+        const mobileSidebarBackdrop = document.getElementById('mobile-sidebar-backdrop');
+
+        if (mobileSidebarToggle) {
+            // Add both click and touch events for better mobile support
+            mobileSidebarToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleMobileSidebar();
+            });
+
+            mobileSidebarToggle.addEventListener('touchend', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                this.toggleMobileSidebar();
+            });
+        }
+
+        if (mobileSidebarBackdrop) {
+            mobileSidebarBackdrop.addEventListener('click', () => this.closeMobileSidebar());
+            mobileSidebarBackdrop.addEventListener('touchend', () => this.closeMobileSidebar());
+        }
+
+        // Sidebar toggle button (works differently on mobile vs desktop)
+        const sidebarToggle = document.querySelector('.sidebar-toggle');
+        if (sidebarToggle) {
+            sidebarToggle.addEventListener('click', (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+
+                if (this.isMobile) {
+                    // On mobile, close the sidebar
+                    this.closeMobileSidebar();
+                } else {
+                    // On desktop, collapse/expand sidebar
+                    this.toggleSidebar();
+                }
+            });
+        }
+
+        // Window resize handler for responsive behavior
+        window.addEventListener('resize', () => this.handleResize());
+
+        // Close mobile nav when clicking outside
+        document.addEventListener('click', (e) => {
+            if (this.mobileNavOpen && !e.target.closest('.nav-tabs') && !e.target.closest('.mobile-nav-toggle')) {
+                this.closeMobileNav();
+            }
+        });
     }
     
     switchTab(tabName) {
@@ -1108,6 +1195,87 @@ class AIWebApp {
 
         messagesContainer.appendChild(messageElement);
         messagesContainer.scrollTop = messagesContainer.scrollHeight;
+    }
+
+    // Mobile Navigation Methods
+    toggleMobileNav() {
+        this.mobileNavOpen = !this.mobileNavOpen;
+        const navTabs = document.getElementById('nav-tabs');
+        const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+
+        if (navTabs && mobileNavToggle) {
+            if (this.mobileNavOpen) {
+                navTabs.classList.add('mobile-open');
+                mobileNavToggle.innerHTML = '<i class="fas fa-times"></i>';
+            } else {
+                navTabs.classList.remove('mobile-open');
+                mobileNavToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        }
+    }
+
+    closeMobileNav() {
+        if (this.mobileNavOpen) {
+            this.mobileNavOpen = false;
+            const navTabs = document.getElementById('nav-tabs');
+            const mobileNavToggle = document.getElementById('mobile-nav-toggle');
+
+            if (navTabs && mobileNavToggle) {
+                navTabs.classList.remove('mobile-open');
+                mobileNavToggle.innerHTML = '<i class="fas fa-bars"></i>';
+            }
+        }
+    }
+
+    // Mobile Sidebar Methods
+    toggleMobileSidebar() {
+        this.mobileSidebarOpen = !this.mobileSidebarOpen;
+        const sidebar = document.getElementById('chat-sidebar');
+        const backdrop = document.getElementById('mobile-sidebar-backdrop');
+
+        if (sidebar && backdrop) {
+            if (this.mobileSidebarOpen) {
+                sidebar.classList.add('mobile-overlay', 'open');
+                backdrop.classList.add('active');
+                document.body.style.overflow = 'hidden'; // Prevent background scrolling
+            } else {
+                this.closeMobileSidebar();
+            }
+        }
+    }
+
+    closeMobileSidebar() {
+        this.mobileSidebarOpen = false;
+        const sidebar = document.getElementById('chat-sidebar');
+        const backdrop = document.getElementById('mobile-sidebar-backdrop');
+
+        if (sidebar && backdrop) {
+            sidebar.classList.remove('open');
+            backdrop.classList.remove('active');
+            document.body.style.overflow = ''; // Restore scrolling
+
+            // Remove mobile-overlay class after transition
+            setTimeout(() => {
+                if (!this.mobileSidebarOpen && sidebar) {
+                    sidebar.classList.remove('mobile-overlay');
+                }
+            }, 300);
+        }
+    }
+
+    // Handle window resize for responsive behavior
+    handleResize() {
+        const newIsMobile = window.innerWidth <= 768;
+
+        if (newIsMobile !== this.isMobile) {
+            this.isMobile = newIsMobile;
+
+            // Close mobile nav and sidebar when switching to desktop
+            if (!this.isMobile) {
+                this.closeMobileNav();
+                this.closeMobileSidebar();
+            }
+        }
     }
 }
 
