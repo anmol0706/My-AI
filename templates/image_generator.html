@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Image Generator</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        /* CSS Variables */
+        :root {
+            --primary-color: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary-color: #6b7280;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            
+            --bg-primary: #ffffff;
+            --bg-secondary: #f8fafc;
+            --bg-tertiary: #f1f5f9;
+            
+            --text-primary: #1f2937;
+            --text-secondary: #6b7280;
+            --text-light: #9ca3af;
+            --text-white: #ffffff;
+            
+            --border-color: #e5e7eb;
+            --border-focus: #4f46e5;
+            
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+            
+            --radius-sm: 0.375rem;
+            --radius-md: 0.5rem;
+            --radius-lg: 0.75rem;
+            --radius-xl: 1rem;
+            
+            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: var(--font-family);
+            background-color: var(--bg-secondary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0;
+            min-height: 100vh;
+        }
+
+        /* Header Navigation Styles */
+        .header-nav {
+            background: var(--bg-primary);
+            border-bottom: 1px solid var(--border-color);
+            padding: 1rem 2rem;
+            margin-bottom: 2rem;
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .logo {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .logo i {
+            font-size: 2rem;
+            color: var(--primary-color);
+        }
+
+        .logo h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin: 0;
+        }
+
+        .nav-tabs {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .nav-tab {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            padding: 0.75rem 1.5rem;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            border-radius: var(--radius-lg);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            font-size: 1rem;
+            text-decoration: none;
+        }
+
+        .nav-tab:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .nav-tab.active {
+            background: var(--primary-color);
+            color: var(--text-white);
+        }
+
+        .nav-tab.nav-link {
+            text-decoration: none;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .nav-tab.nav-link:hover {
+            background: var(--success-color);
+            color: var(--text-white);
+        }
+
+
+
+        .image-generator {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            min-height: 600px;
+            margin: 2rem;
+            padding-bottom: 2rem;
+        }
+
+        .form-section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            height: fit-content;
+        }
+
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .form-group textarea,
+        .form-group select,
+        .form-group input {
+            width: 100%;
+            border: 2px solid var(--border-color);
+            border-radius: var(--radius-md);
+            padding: 0.75rem;
+            font-family: inherit;
+            font-size: 1rem;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group textarea:focus,
+        .form-group select:focus,
+        .form-group input:focus {
+            outline: none;
+            border-color: var(--border-focus);
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+
+        .char-counter {
+            display: block;
+            text-align: right;
+            margin-top: 0.25rem;
+            font-size: 0.875rem;
+            color: var(--text-light);
+        }
+
+        .advanced-settings {
+            margin-bottom: 1.5rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .advanced-toggle {
+            width: 100%;
+            padding: 1rem;
+            border: none;
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-weight: 500;
+        }
+
+        .advanced-toggle:hover {
+            background: var(--bg-secondary);
+        }
+
+        .advanced-toggle span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .advanced-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.3s ease;
+            background: var(--bg-primary);
+        }
+
+        .advanced-settings.open .advanced-content {
+            max-height: 300px;
+            padding: 1.5rem;
+        }
+
+        .range-group {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .range-group input[type="range"] {
+            flex: 1;
+        }
+
+        .range-value {
+            min-width: 40px;
+            text-align: center;
+            font-weight: 500;
+            color: var(--primary-color);
+            background: var(--bg-tertiary);
+            padding: 0.25rem 0.5rem;
+            border-radius: var(--radius-sm);
+            font-size: 0.875rem;
+        }
+
+        .seed-group {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .seed-group input {
+            flex: 1;
+        }
+
+        .random-btn {
+            padding: 0.75rem 1rem;
+            border: 2px solid var(--border-color);
+            background: var(--bg-tertiary);
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            white-space: nowrap;
+        }
+
+        .random-btn:hover {
+            background: var(--primary-color);
+            color: var(--text-white);
+            border-color: var(--primary-color);
+        }
+
+        .generate-btn {
+            width: 100%;
+            padding: 1rem 2rem;
+            border: none;
+            background: var(--primary-color);
+            color: var(--text-white);
+            border-radius: var(--radius-lg);
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            background: var(--primary-hover);
+            transform: translateY(-1px);
+        }
+
+        .generate-btn:disabled {
+            background: var(--text-light);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .results-section {
+            background: var(--bg-primary);
+            border-radius: var(--radius-xl);
+            box-shadow: var(--shadow-md);
+            padding: 2rem;
+            overflow-y: auto;
+        }
+
+        .results-section h3 {
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+        }
+
+        .image-result {
+            margin-bottom: 2rem;
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            overflow: hidden;
+        }
+
+        .image-result img {
+            width: 100%;
+            height: auto;
+            display: block;
+        }
+
+        .image-info {
+            padding: 1rem;
+            background: var(--bg-secondary);
+        }
+
+        .image-prompt {
+            font-size: 0.875rem;
+            color: var(--text-secondary);
+            margin-bottom: 0.75rem;
+            line-height: 1.4;
+        }
+
+        .image-details {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+            font-size: 0.8rem;
+        }
+
+        .detail-item {
+            color: var(--text-light);
+            padding: 0.25rem 0.5rem;
+            background: var(--bg-tertiary);
+            border-radius: var(--radius-sm);
+        }
+
+        .detail-item strong {
+            color: var(--text-primary);
+        }
+
+        .image-actions {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+
+        .image-action {
+            padding: 0.5rem 1rem;
+            border: 1px solid var(--border-color);
+            background: var(--bg-primary);
+            color: var(--text-secondary);
+            border-radius: var(--radius-md);
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 0.875rem;
+            text-decoration: none;
+        }
+
+        .image-action:hover {
+            background: var(--bg-tertiary);
+            color: var(--text-primary);
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-secondary);
+        }
+
+        .spinner {
+            width: 40px;
+            height: 40px;
+            border: 4px solid var(--border-color);
+            border-top: 4px solid var(--primary-color);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        /* Generating Indicator */
+        .generating-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 3rem 2rem;
+            background: var(--bg-secondary);
+            border-radius: var(--radius-xl);
+            border: 2px dashed var(--border-color);
+            margin: 2rem 0;
+        }
+
+        .generating-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .generating-icon {
+            font-size: 2rem;
+            color: var(--primary-color);
+            animation: pulse 2s infinite;
+        }
+
+        .generating-text {
+            text-align: center;
+            color: var(--text-secondary);
+            font-weight: 500;
+        }
+
+        .generating-dots {
+            display: flex;
+            gap: 0.25rem;
+            margin-top: 0.5rem;
+            justify-content: center;
+        }
+
+        .generating-dot {
+            width: 8px;
+            height: 8px;
+            background: var(--primary-color);
+            border-radius: 50%;
+            animation: generating 1.4s infinite ease-in-out;
+        }
+
+        .generating-dot:nth-child(1) { animation-delay: -0.32s; }
+        .generating-dot:nth-child(2) { animation-delay: -0.16s; }
+
+        @keyframes generating {
+            0%, 80%, 100% { transform: scale(0.8); opacity: 0.5; }
+            40% { transform: scale(1.2); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.1); }
+        }
+
+        .toast {
+            position: fixed;
+            top: 2rem;
+            right: 2rem;
+            background: var(--bg-primary);
+            border: 1px solid var(--border-color);
+            border-radius: var(--radius-lg);
+            padding: 1rem 1.5rem;
+            box-shadow: var(--shadow-lg);
+            z-index: 1000;
+            display: none;
+        }
+
+        .toast.success {
+            border-left: 4px solid var(--success-color);
+        }
+
+        .toast.error {
+            border-left: 4px solid var(--danger-color);
+        }
+
+        @media (max-width: 768px) {
+            .image-generator {
+                grid-template-columns: 1fr;
+                gap: 1rem;
+                margin: 0 1rem;
+            }
+
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+
+            .header-nav {
+                padding: 1rem;
+            }
+
+            .header-content {
+                flex-direction: column;
+                gap: 1rem;
+                text-align: center;
+            }
+
+            .nav-tabs {
+                justify-content: center;
+            }
+
+            .logo h1 {
+                font-size: 1.25rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Header with Navigation -->
+        <header class="header-nav">
+            <div class="header-content">
+                <div class="logo">
+                    <i class="fas fa-robot"></i>
+                    <h1>AI Web Application</h1>
+                </div>
+
+                <nav class="nav-tabs">
+                    <a href="/" class="nav-tab nav-link">
+                        <i class="fas fa-comments"></i>
+                        Chat
+                    </a>
+                    <button class="nav-tab active">
+                        <i class="fas fa-magic"></i>
+                        Images
+                    </button>
+                </nav>
+            </div>
+        </header>
+
+
+
+        <div class="image-generator">
+            <div class="form-section">
+                <h3>Generate AI Images</h3>
+                
+                <div class="form-group">
+                    <label for="prompt">Prompt</label>
+                    <textarea 
+                        id="prompt" 
+                        placeholder="Describe the image you want to generate..."
+                        rows="3"
+                        maxlength="1000"
+                    ></textarea>
+                    <span class="char-counter">0/1000</span>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="model">AI Model</label>
+                        <select id="model">
+                            <option value="sdxl" selected>Stable Diffusion XL (High Quality)</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="size">Size</label>
+                        <select id="size">
+                            <option value="512x512">Small (512x512)</option>
+                            <option value="768x768" selected>Medium (768x768)</option>
+                            <option value="1024x1024">Large (1024x1024)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-row">
+                    <div class="form-group">
+                        <label for="style">Style</label>
+                        <select id="style">
+                            <option value="realistic" selected>Realistic</option>
+                            <option value="artistic">Artistic</option>
+                            <option value="cartoon">Cartoon</option>
+                            <option value="abstract">Abstract</option>
+                        </select>
+                    </div>
+
+                    <div class="form-group">
+                        <label for="num-images">Number of Images</label>
+                        <select id="num-images">
+                            <option value="1" selected>1 Image</option>
+                            <option value="2">2 Images</option>
+                            <option value="3">3 Images</option>
+                            <option value="4">4 Images</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label for="negative-prompt">Negative Prompt (Optional)</label>
+                    <textarea 
+                        id="negative-prompt" 
+                        placeholder="What to avoid in the image..."
+                        rows="2"
+                        maxlength="500"
+                    ></textarea>
+                    <span class="char-counter">0/500</span>
+                </div>
+
+                <!-- Advanced Settings -->
+                <div class="advanced-settings" id="advanced-settings">
+                    <button type="button" class="advanced-toggle" id="advanced-toggle">
+                        <span>
+                            <i class="fas fa-cog"></i>
+                            Advanced Settings
+                        </span>
+                        <i class="fas fa-chevron-down"></i>
+                    </button>
+                    
+                    <div class="advanced-content">
+                        <div class="form-row">
+                            <div class="form-group">
+                                <label for="guidance-scale">Guidance Scale (1-20)</label>
+                                <div class="range-group">
+                                    <input type="range" id="guidance-scale" min="1" max="20" value="7.5" step="0.5">
+                                    <span class="range-value" id="guidance-value">7.5</span>
+                                </div>
+                            </div>
+
+                            <div class="form-group">
+                                <label for="steps">Steps (10-50)</label>
+                                <div class="range-group">
+                                    <input type="range" id="steps" min="10" max="50" value="20" step="1">
+                                    <span class="range-value" id="steps-value">20</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="seed">Seed (Optional)</label>
+                            <div class="seed-group">
+                                <input type="number" id="seed" placeholder="Random seed for reproducibility">
+                                <button type="button" class="random-btn" id="random-seed">
+                                    <i class="fas fa-dice"></i> Random
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <button id="generate" class="generate-btn">
+                    <i class="fas fa-magic"></i>
+                    Generate Image
+                </button>
+            </div>
+
+            <div class="results-section">
+                <h3>Generated Images</h3>
+                <div id="results">
+                    <div class="loading" style="display: none;" id="loading">
+                        <div class="spinner"></div>
+                        <p>Generating your image...</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="toast" id="toast">
+        <span id="toast-message"></span>
+    </div>
+
+    <script src="/static/js/image_generator.js"></script>
+</body>
+</html>

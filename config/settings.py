@@ -1,0 +1,38 @@
+from pydantic_settings import BaseSettings
+from typing import List
+import os
+from dotenv import load_dotenv
+
+# Load environment variables from .env file
+load_dotenv()
+
+class Settings(BaseSettings):
+    # Application settings
+    app_name: str = "AI Web Application"
+    debug: bool = True
+    host: str = "0.0.0.0"
+    port: int = 8000
+    
+    # API Keys
+    gemini_api_key: str
+    huggingface_api_key: str
+    
+    # CORS settings
+    allowed_origins: List[str] = [
+        "http://localhost:3000",
+        "http://127.0.0.1:3000", 
+        "http://localhost:8000",
+        "http://127.0.0.1:8000"
+    ]
+    
+    # API settings
+    max_tokens: int = 1000
+    temperature: float = 0.7
+    request_timeout: int = 30
+    
+    class Config:
+        env_file = ".env"
+        case_sensitive = False
+
+# Create settings instance
+settings = Settings()

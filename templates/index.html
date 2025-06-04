@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Web Application</title>
+    <link rel="stylesheet" href="/static/css/styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header -->
+        <header class="app-header">
+            <div class="header-content">
+                <h1 class="app-title">
+                    <i class="fas fa-robot"></i>
+                    AI Web Application
+                </h1>
+                <nav class="nav-tabs">
+                    <button class="nav-tab active" data-tab="chat">
+                        <i class="fas fa-comments"></i>
+                        Chat
+                    </button>
+                    <a href="/image-generator" class="nav-tab nav-link">
+                        <i class="fas fa-magic"></i>
+                        Images
+                    </a>
+                </nav>
+            </div>
+        </header>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Chat Tab -->
+            <div class="tab-content active" id="chat-tab">
+                <div class="chat-layout">
+                    <!-- Chat Sidebar -->
+                    <div class="chat-sidebar" id="chat-sidebar">
+                        <div class="sidebar-header">
+                            <h3>Chat History</h3>
+                            <button class="new-chat-btn" id="new-chat-btn">
+                                <i class="fas fa-plus"></i>
+                                <span>New Chat</span>
+                            </button>
+                        </div>
+                        <div class="sidebar-content">
+                            <div class="chat-sessions" id="chat-sessions">
+                                <!-- Chat sessions will be populated here -->
+                            </div>
+                        </div>
+                        <div class="sidebar-footer">
+                            <button class="sidebar-toggle" id="sidebar-toggle">
+                                <i class="fas fa-chevron-left"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Main Chat Area -->
+                    <div class="chat-container">
+                        <div class="chat-messages" id="chat-messages">
+                        <div class="welcome-message">
+                            <div class="welcome-icon">
+                                <i class="fas fa-robot"></i>
+                            </div>
+                            <h2>Welcome to AI Chat!</h2>
+                            <p>Start a conversation by typing a message below.</p>
+                        </div>
+                    </div>
+                    
+                    <div class="chat-input-container">
+                        <div class="chat-input-wrapper">
+                            <textarea 
+                                id="chat-input" 
+                                placeholder="Type your message here..." 
+                                rows="1"
+                                maxlength="2000"
+                            ></textarea>
+                            <button id="send-button" class="send-button" disabled>
+                                <i class="fas fa-paper-plane"></i>
+                            </button>
+                        </div>
+                        <div class="input-footer">
+                            <span class="char-counter">0/2000</span>
+                            <button id="clear-chat" class="clear-button">
+                                <i class="fas fa-trash"></i>
+                                Clear Chat
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Images Tab - Redirects to dedicated generator -->
+            <div class="tab-content" id="images-tab">
+                <div class="redirect-container">
+                    <div class="redirect-card">
+                        <div class="redirect-icon">
+                            <i class="fas fa-magic"></i>
+                        </div>
+                        <h2>AI Image Generator</h2>
+                        <p>We've created a dedicated, full-featured image generator for the best experience!</p>
+                        <a href="/image-generator" class="redirect-button">
+                            <i class="fas fa-arrow-right"></i>
+                            Go to Image Generator
+                        </a>
+                        <div class="features-list">
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <span>4 Advanced AI Models</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <span>Professional Controls</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check"></i>
+                                <span>Enhanced Interface</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+
+        </main>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loading-overlay">
+            <div class="loading-spinner">
+                <div class="spinner"></div>
+                <p id="loading-text">Processing...</p>
+            </div>
+        </div>
+
+        <!-- Toast Notifications -->
+        <div class="toast-container" id="toast-container">
+            <!-- Toast notifications will appear here -->
+        </div>
+    </div>
+
+    <!-- Hidden file input for import -->
+    <input type="file" id="file-input" accept=".json" style="display: none;">
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
