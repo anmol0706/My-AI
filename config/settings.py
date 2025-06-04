@@ -8,7 +8,7 @@ load_dotenv()
 
 class Settings(BaseSettings):
     # Application settings
-    app_name: str = "My-AI"
+   app_name: str = "Visionary.AI"
     debug: bool = os.getenv("DEBUG", "true").lower() == "true"
     host: str = "0.0.0.0"
     port: int = int(os.getenv("PORT", "8000"))
